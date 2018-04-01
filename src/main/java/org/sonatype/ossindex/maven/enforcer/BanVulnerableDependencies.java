@@ -103,14 +103,12 @@ public class BanVulnerableDependencies
             }
 
             log.info("Checking for vulnerabilities:");
-            for (Artifact artifact : dependencies) {
-                log.info("  " + artifact);
-
-            }
-
             Map<Artifact, PackageReport> vulnerableDependencies = new HashMap<>();
             for (Artifact artifact : dependencies) {
+                log.info("  " + artifact);
                 try {
+                    // TODO: consider some form of caching to avoid hitting the service for multi-module builds over and over?
+
                     PackageReport report = index.request(artifact);
                     List<PackageReport.Vulnerability> vulnerabilities = report.getVulnerabilities();
                     if (!vulnerabilities.isEmpty()) {
@@ -135,8 +133,8 @@ public class BanVulnerableDependencies
                             .append("\n");
 
                     for (PackageReport.Vulnerability vulnerability : report.getVulnerabilities()) {
-                        buff.append("    ")
-                                .append(vulnerability.getId()).append(": ").append(vulnerability.getTitle())
+                        buff.append("    * ")
+                                .append(vulnerability.getTitle())
                                 .append("; ").append(index.referenceUrl(vulnerability))
                                 .append("\n");
                     }
