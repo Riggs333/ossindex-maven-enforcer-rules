@@ -8,7 +8,7 @@ Adds [maven-enforcer-plugin][2] rules to integrate security information from [So
 
 ## Usage
 
-To use configure an execution of the `maven-enforcer-plugin` and configure `ossindex-maven-enforcer-rules` dependency and rule:
+Configure an execution of the `maven-enforcer-plugin` and configure `ossindex-maven-enforcer-rules` dependency and rule:
 
     <plugin>
         <groupId>org.apache.maven.plugins</groupId>
