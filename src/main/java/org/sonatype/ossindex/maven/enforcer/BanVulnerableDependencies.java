@@ -16,6 +16,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
@@ -73,6 +74,8 @@ public class BanVulnerableDependencies
 
         private final Log log;
 
+        private final MavenSession session;
+
         private final MavenProject project;
 
         private final DependencyGraphBuilder graphBuilder;
@@ -82,12 +85,18 @@ public class BanVulnerableDependencies
         public Task(final EnforcerRuleHelper helper) {
             this.helper = helper;
             this.log = helper.getLog();
+            this.session = lookup(helper, "${session}", MavenSession.class);
             this.project = lookup(helper,"${project}", MavenProject.class);
             this.graphBuilder = lookup(helper, DependencyGraphBuilder.class);
             this.index = new OssIndex();
         }
 
         public void run() throws EnforcerRuleException {
+            if (session.isOffline()) {
+                log.warn("Skipping vulnerability evaluation; Maven offline mode detected");
+                return;
+            }
+
             // determine dependencies
             Set<Artifact> dependencies;
             try {
