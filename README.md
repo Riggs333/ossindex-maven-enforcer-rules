@@ -8,6 +8,8 @@ Adds [maven-enforcer-plugin][2] rules to integrate security information from [So
 
 ## Usage
 
+Requires an internet connection and access to [Sonatype OSS Index][1] service.
+
 Configure an execution of the `maven-enforcer-plugin` and configure `ossindex-maven-enforcer-rules` dependency and rule:
 
     <plugin>
