@@ -13,6 +13,7 @@
 package org.sonatype.ossindex.maven.enforcer;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
 import org.apache.maven.plugin.logging.Log;
@@ -36,7 +37,17 @@ import java.util.HashSet;
 public class BanVulnerableDependencies
     extends EnforcerRuleSupport
 {
+    private ArtifactFilter filter;
+
     private boolean transitive = true;
+
+    public ArtifactFilter getFilter() {
+        return filter;
+    }
+
+    public void setFilter(final ArtifactFilter filter) {
+        this.filter = filter;
+    }
 
     public boolean isTransitive() {
         return transitive;
@@ -126,18 +137,19 @@ public class BanVulnerableDependencies
         private Set<Artifact> resolveDependencies() throws DependencyGraphBuilderException {
             Set<Artifact> result = new HashSet<>();
 
-            DependencyNode node = graphBuilder.buildDependencyGraph(project, null);
-            includeChildren(result, node);
+            DependencyNode node = graphBuilder.buildDependencyGraph(project, filter);
+            collectArtifacts(result, node);
 
             return result;
         }
 
-        private void includeChildren(final Set<Artifact> artifacts, final DependencyNode node) {
+        private void collectArtifacts(final Set<Artifact> artifacts, final DependencyNode node) {
             if (node.getChildren() != null) {
                 for (DependencyNode child : node.getChildren()) {
                     artifacts.add(child.getArtifact());
+
                     if (transitive) {
-                        includeChildren(artifacts, child);
+                        collectArtifacts(artifacts, child);
                     }
                 }
             }
