@@ -13,22 +13,20 @@
 package org.sonatype.ossindex.maven.enforcer;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.enforcer.rule.api.EnforcerRule2;
-import org.apache.maven.enforcer.rule.api.EnforcerLevel;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
-import org.apache.maven.enforcer.rule.api.EnforcerRule;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
 import org.apache.maven.shared.dependency.graph.DependencyGraphBuilderException;
 import org.apache.maven.shared.dependency.graph.DependencyNode;
-import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * Enforcer rule to ban vulnerable dependencies.
@@ -36,39 +34,11 @@ import java.util.*;
  * @since ???
  */
 public class BanVulnerableDependencies
-    implements EnforcerRule2
+    extends EnforcerRuleSupport
 {
-    private EnforcerLevel level = EnforcerLevel.ERROR;
-
-    public void setLevel(final EnforcerLevel level) {
-        this.level = level;
-    }
-
-    @Nonnull
     @Override
-    public EnforcerLevel getLevel() {
-        return level;
-    }
-
-    @Override
-    public void execute(@Nonnull EnforcerRuleHelper helper) throws EnforcerRuleException {
+    public void execute(@Nonnull final EnforcerRuleHelper helper) throws EnforcerRuleException {
         new Task(helper).run();
-    }
-
-    @Override
-    public boolean isCacheable() {
-        return false;
-    }
-
-    @Nullable
-    @Override
-    public String getCacheId() {
-        return "0";
-    }
-
-    @Override
-    public boolean isResultValid(@Nonnull EnforcerRule rule) {
-        return false;
     }
 
     /**
@@ -89,8 +59,8 @@ public class BanVulnerableDependencies
         public Task(final EnforcerRuleHelper helper) {
             this.helper = helper;
             this.log = helper.getLog();
-            this.project = lookup("${project}", MavenProject.class);
-            this.graphBuilder = lookup(DependencyGraphBuilder.class);
+            this.project = lookup(helper,"${project}", MavenProject.class);
+            this.graphBuilder = lookup(helper, DependencyGraphBuilder.class);
             this.index = new OssIndex();
         }
 
@@ -158,23 +128,6 @@ public class BanVulnerableDependencies
                     artifacts.add(child.getArtifact());
                     includeChildren(artifacts, child);
                 }
-            }
-        }
-
-        @SuppressWarnings("unchecked")
-        private <T> T lookup(final String expression, final Class<T> type) {
-            try {
-                return (T) helper.evaluate(expression);
-            } catch (ExpressionEvaluationException e) {
-                throw new RuntimeException("Failed to evaluate expression: " + expression, e);
-            }
-        }
-
-        private <T> T lookup(final Class<T> type) {
-            try {
-                return helper.getComponent(type);
-            } catch (ComponentLookupException e) {
-                throw new RuntimeException("Failed to lookup component: " + type.getSimpleName(), e);
             }
         }
     }
