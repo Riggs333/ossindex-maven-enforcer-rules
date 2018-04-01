@@ -42,9 +42,7 @@
                         </goals>
                         <configuration>
                             <rules>
-                                <banVunerableDependencies implementation="org.sonatype.ossindex.maven.enforcer.BanVulnerableDependencies">
-                                    <!-- TODO: -->
-                                </banVunerableDependencies>
+                                <banVunerableDependencies implementation="org.sonatype.ossindex.maven.enforcer.BanVulnerableDependencies"/>
                             </rules>
                         </configuration>
                     </execution>
