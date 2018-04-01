@@ -12,17 +12,26 @@
  */
 package org.sonatype.ossindex.maven.enforcer;
 
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.enforcer.rule.api.EnforcerRule2;
 import org.apache.maven.enforcer.rule.api.EnforcerLevel;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
 import org.apache.maven.enforcer.rule.api.EnforcerRule;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
+import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
+import org.apache.maven.shared.dependency.graph.DependencyGraphBuilderException;
+import org.apache.maven.shared.dependency.graph.DependencyNode;
+import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.*;
 
 /**
- * ???
+ * Enforcer rule to ban vulnerable dependencies.
  *
  * @since ???
  */
@@ -43,7 +52,7 @@ public class BanVulnerableDependencies
 
     @Override
     public void execute(@Nonnull EnforcerRuleHelper helper) throws EnforcerRuleException {
-        // TODO:
+        new Task(helper).run();
     }
 
     @Override
@@ -60,5 +69,115 @@ public class BanVulnerableDependencies
     @Override
     public boolean isResultValid(@Nonnull EnforcerRule rule) {
         return false;
+    }
+
+    /**
+     * Encapsulates state for rule evaluation.
+     */
+    private class Task
+    {
+        private final EnforcerRuleHelper helper;
+
+        private final Log log;
+
+        private final MavenProject project;
+
+        private final DependencyGraphBuilder graphBuilder;
+
+        private final OssIndex index;
+
+        public Task(final EnforcerRuleHelper helper) throws EnforcerRuleException {
+            this.helper = helper;
+            this.log = helper.getLog();
+            this.project = lookup("${project}", MavenProject.class);
+            this.graphBuilder = lookup(DependencyGraphBuilder.class);
+            this.index = new OssIndex();
+        }
+
+        public void run() throws EnforcerRuleException {
+            Set<Artifact> dependencies;
+            try {
+                dependencies = resolveDependencies();
+            } catch (DependencyGraphBuilderException e) {
+                throw new EnforcerRuleException("Failed to resolve dependencies", e);
+            }
+
+            log.info("Checking for vulnerabilities:");
+            for (Artifact artifact : dependencies) {
+                log.info("  " + artifact);
+
+            }
+
+            Map<Artifact, PackageReport> vulnerableDependencies = new HashMap<>();
+            for (Artifact artifact : dependencies) {
+                try {
+                    PackageReport report = index.request(artifact);
+                    List<PackageReport.Vulnerability> vulnerabilities = report.getVulnerabilities();
+                    if (!vulnerabilities.isEmpty()) {
+                        vulnerableDependencies.put(artifact, report);
+                    }
+                }
+                catch (Exception e) {
+                    log.warn("Failed to fetch package-report for: " + artifact, e);
+                }
+            }
+
+            if (!vulnerableDependencies.isEmpty()) {
+                StringBuilder buff = new StringBuilder();
+                buff.append("Detected ").append(vulnerableDependencies.size()).append(" vulnerable dependencies:\n");
+                for (Map.Entry<Artifact, PackageReport> entry : vulnerableDependencies.entrySet()) {
+                    Artifact artifact = entry.getKey();
+                    PackageReport report = entry.getValue();
+
+                    buff.append("  ")
+                            .append(artifact).append("; ")
+                            .append(index.packageUrl(report))
+                            .append("\n");
+
+                    for (PackageReport.Vulnerability vulnerability : report.getVulnerabilities()) {
+                        buff.append("    ")
+                                .append(vulnerability.getId()).append(": ").append(vulnerability.getTitle())
+                                .append("; ").append(index.referenceUrl(vulnerability))
+                                .append("\n");
+                    }
+                }
+                throw new EnforcerRuleException(buff.toString());
+            }
+        }
+
+        private Set<Artifact> resolveDependencies() throws DependencyGraphBuilderException {
+            Set<Artifact> result = new HashSet<>();
+
+            DependencyNode node = graphBuilder.buildDependencyGraph(project, null);
+            includeChildren(result, node);
+
+            return result;
+        }
+
+        private void includeChildren(final Set<Artifact> artifacts, final DependencyNode node) {
+            if (node.getChildren() != null) {
+                for (DependencyNode child : node.getChildren()) {
+                    artifacts.add(child.getArtifact());
+                    includeChildren(artifacts, child);
+                }
+            }
+        }
+
+        @SuppressWarnings("unchecked")
+        private <T> T lookup(final String expression, final Class<T> type) throws EnforcerRuleException {
+            try {
+                return (T) helper.evaluate(expression);
+            } catch (ExpressionEvaluationException e) {
+                throw new EnforcerRuleException("Failed to evaluate expression: " + expression, e);
+            }
+        }
+
+        private <T> T lookup(final Class<T> type) throws EnforcerRuleException {
+            try {
+                return helper.getComponent(type);
+            } catch (ComponentLookupException e) {
+                throw new EnforcerRuleException("Failed to lookup component: " + type.getSimpleName(), e);
+            }
+        }
     }
 }

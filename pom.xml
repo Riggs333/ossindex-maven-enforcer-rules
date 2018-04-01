@@ -51,6 +51,12 @@
 
   <dependencies>
     <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.7.25</version>
+    </dependency>
+
+    <dependency>
       <groupId>com.google.code.findbugs</groupId>
       <artifactId>jsr305</artifactId>
       <version>3.0.2</version>
@@ -69,7 +75,7 @@
       <version>${apache-maven.version}</version>
     </dependency>
 
-    <!-- TODO: resolve exactly which dependencies are needed -->
+    <!-- TODO: resolve exactly which dependencies are needed, and which versions for best compatibility -->
 
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -87,6 +93,19 @@
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-artifact</artifactId>
       <version>${apache-maven.version}</version>
+    </dependency>
+
+    <!-- HACK: maven-enforcer-plugin uses older maven-dependency-tree 2.x API and is not compatible with latest 3.x -->
+    <dependency>
+      <groupId>org.apache.maven.shared</groupId>
+      <artifactId>maven-dependency-tree</artifactId>
+      <version>2.2</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+      <version>2.8.2</version>
     </dependency>
 
     <dependency>
