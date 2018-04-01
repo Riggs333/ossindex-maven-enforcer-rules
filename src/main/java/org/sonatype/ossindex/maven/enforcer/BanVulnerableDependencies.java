@@ -86,6 +86,7 @@ public class BanVulnerableDependencies
         }
 
         public void run() throws EnforcerRuleException {
+            // determine dependencies
             Set<Artifact> dependencies;
             try {
                 dependencies = resolveDependencies();
@@ -93,6 +94,7 @@ public class BanVulnerableDependencies
                 throw new RuntimeException("Failed to resolve dependencies", e);
             }
 
+            // check if any dependencies have vulnerabilities
             log.info("Checking for vulnerabilities:");
             Map<Artifact, PackageReport> vulnerableDependencies = new HashMap<>();
             for (Artifact artifact : dependencies) {
@@ -111,6 +113,7 @@ public class BanVulnerableDependencies
                 }
             }
 
+            // if any vulnerabilities were detected, generate a report and complain
             if (!vulnerableDependencies.isEmpty()) {
                 StringBuilder buff = new StringBuilder();
                 buff.append("Detected ").append(vulnerableDependencies.size()).append(" vulnerable dependencies:\n");
@@ -134,6 +137,9 @@ public class BanVulnerableDependencies
             }
         }
 
+        /**
+         * Resolve dependencies to inspect for vulnerabilities.
+         */
         private Set<Artifact> resolveDependencies() throws DependencyGraphBuilderException {
             Set<Artifact> result = new HashSet<>();
 
@@ -143,6 +149,11 @@ public class BanVulnerableDependencies
             return result;
         }
 
+        /**
+         * Collect artifacts from dependency.
+         *
+         * Optionally including transitive dependencies if {@link #transitive} is {@code true}.
+         */
         private void collectArtifacts(final Set<Artifact> artifacts, final DependencyNode node) {
             if (node.getChildren() != null) {
                 for (DependencyNode child : node.getChildren()) {
