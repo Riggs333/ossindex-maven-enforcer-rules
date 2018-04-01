@@ -23,7 +23,6 @@ To use configure an execution of the `maven-enforcer-plugin` and configure `ossi
         </dependencies>
         <executions>
             <execution>
-                <id>checks</id>
                 <phase>validate</phase>
                 <goals>
                     <goal>enforce</goal>
