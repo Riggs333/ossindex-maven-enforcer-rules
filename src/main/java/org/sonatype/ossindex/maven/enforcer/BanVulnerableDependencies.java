@@ -92,8 +92,9 @@ public class BanVulnerableDependencies
         }
 
         public void run() throws EnforcerRuleException {
+            // skip if maven is in offline mode
             if (session.isOffline()) {
-                log.warn("Skipping vulnerability evaluation; Maven offline mode detected");
+                log.warn("Skipping " + BanVulnerableDependencies.class.getSimpleName() + " evaluation; Offline mode detected");
                 return;
             }
 
