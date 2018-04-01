@@ -86,7 +86,7 @@ public class BanVulnerableDependencies
 
         private final OssIndex index;
 
-        public Task(final EnforcerRuleHelper helper) throws EnforcerRuleException {
+        public Task(final EnforcerRuleHelper helper) {
             this.helper = helper;
             this.log = helper.getLog();
             this.project = lookup("${project}", MavenProject.class);
@@ -99,7 +99,7 @@ public class BanVulnerableDependencies
             try {
                 dependencies = resolveDependencies();
             } catch (DependencyGraphBuilderException e) {
-                throw new EnforcerRuleException("Failed to resolve dependencies", e);
+                throw new RuntimeException("Failed to resolve dependencies", e);
             }
 
             log.info("Checking for vulnerabilities:");
@@ -162,19 +162,19 @@ public class BanVulnerableDependencies
         }
 
         @SuppressWarnings("unchecked")
-        private <T> T lookup(final String expression, final Class<T> type) throws EnforcerRuleException {
+        private <T> T lookup(final String expression, final Class<T> type) {
             try {
                 return (T) helper.evaluate(expression);
             } catch (ExpressionEvaluationException e) {
-                throw new EnforcerRuleException("Failed to evaluate expression: " + expression, e);
+                throw new RuntimeException("Failed to evaluate expression: " + expression, e);
             }
         }
 
-        private <T> T lookup(final Class<T> type) throws EnforcerRuleException {
+        private <T> T lookup(final Class<T> type) {
             try {
                 return helper.getComponent(type);
             } catch (ComponentLookupException e) {
-                throw new EnforcerRuleException("Failed to lookup component: " + type.getSimpleName(), e);
+                throw new RuntimeException("Failed to lookup component: " + type.getSimpleName(), e);
             }
         }
     }
