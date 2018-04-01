@@ -36,6 +36,16 @@ import java.util.HashSet;
 public class BanVulnerableDependencies
     extends EnforcerRuleSupport
 {
+    private boolean transitive = true;
+
+    public boolean isTransitive() {
+        return transitive;
+    }
+
+    public void setTransitive(final boolean transitive) {
+        this.transitive = transitive;
+    }
+
     @Override
     public void execute(@Nonnull final EnforcerRuleHelper helper) throws EnforcerRuleException {
         new Task(helper).run();
@@ -126,7 +136,9 @@ public class BanVulnerableDependencies
             if (node.getChildren() != null) {
                 for (DependencyNode child : node.getChildren()) {
                     artifacts.add(child.getArtifact());
-                    includeChildren(artifacts, child);
+                    if (transitive) {
+                        includeChildren(artifacts, child);
+                    }
                 }
             }
         }
