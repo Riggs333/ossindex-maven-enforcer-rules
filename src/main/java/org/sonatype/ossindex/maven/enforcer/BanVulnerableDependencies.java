@@ -23,6 +23,7 @@ import org.apache.maven.shared.dependency.graph.DependencyGraphBuilderException;
 import org.apache.maven.shared.dependency.graph.DependencyNode;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -41,11 +42,12 @@ public class BanVulnerableDependencies
 
     private boolean transitive = true;
 
+    @Nullable
     public ArtifactFilter getFilter() {
         return filter;
     }
 
-    public void setFilter(final ArtifactFilter filter) {
+    public void setFilter(@Nullable final ArtifactFilter filter) {
         this.filter = filter;
     }
 
