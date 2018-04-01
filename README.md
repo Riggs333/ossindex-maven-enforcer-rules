@@ -1,5 +1,7 @@
 # Sonatype OSS Index - Maven Enforcer Rules
 
+Adds `maven-enforcer-plugin` rules to integrate security information from [Sonatype OSS Index][1] into Maven builds.
+
 ## Features
 
 * Ban vulnerable dependencies
@@ -34,3 +36,5 @@ To use configure an execution of the `maven-enforcer-plugin` and configure `ossi
             </execution>
         </executions>
     </plugin>
+
+[1]: https://ossindex.sonatype.org
