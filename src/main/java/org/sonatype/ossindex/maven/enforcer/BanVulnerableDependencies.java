@@ -25,7 +25,6 @@ import org.apache.maven.shared.dependency.graph.DependencyNode;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.HashMap;
@@ -113,10 +112,10 @@ public class BanVulnerableDependencies
                 log.info("  " + artifact);
                 try {
                     // TODO: consider some form of caching to avoid hitting the service for multi-module builds over and over?
-
                     PackageReport report = index.request(artifact);
-                    List<PackageReport.Vulnerability> vulnerabilities = report.getVulnerabilities();
-                    if (!vulnerabilities.isEmpty()) {
+
+                    // if report contains any vulnerabilities then record artifact mapping
+                    if (!report.getVulnerabilities().isEmpty()) {
                         vulnerableDependencies.put(artifact, report);
                     }
                 }
@@ -129,6 +128,8 @@ public class BanVulnerableDependencies
             if (!vulnerableDependencies.isEmpty()) {
                 StringBuilder buff = new StringBuilder();
                 buff.append("Detected ").append(vulnerableDependencies.size()).append(" vulnerable dependencies:\n");
+
+                // include details about each vulnerable dependency
                 for (Map.Entry<Artifact, PackageReport> entry : vulnerableDependencies.entrySet()) {
                     Artifact artifact = entry.getKey();
                     PackageReport report = entry.getValue();
@@ -138,6 +139,7 @@ public class BanVulnerableDependencies
                             .append(index.packageUrl(report))
                             .append("\n");
 
+                    // include terse details about vulnerability and link to more detailed information
                     for (PackageReport.Vulnerability vulnerability : report.getVulnerabilities()) {
                         buff.append("    * ")
                                 .append(vulnerability.getTitle())
@@ -145,6 +147,7 @@ public class BanVulnerableDependencies
                                 .append("\n");
                     }
                 }
+
                 throw new EnforcerRuleException(buff.toString());
             }
         }
