@@ -80,13 +80,16 @@ public class OssIndex {
         throw new RuntimeException("Unexpected response; status: " + status);
     }
 
-    public URL packageUrl(final PackageReport report) {
-        String url = String.format("%s/resource/package/%s", baseUrl, report.getId());
+    private URL url(final String url) {
         try {
             return new URL(url);
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public URL packageUrl(final PackageReport report) {
+        return url(String.format("%s/resource/package/%s", baseUrl, report.getId()));
     }
 
     public URL referenceUrl(final PackageReport.Vulnerability vulnerability) {
@@ -97,12 +100,6 @@ public class OssIndex {
         else {
             type = "cve";
         }
-        String url = String.format("%s/resource/%s/%s", baseUrl, type, vulnerability.getId());
-
-        try {
-            return new URL(url);
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
-        }
+        return url(String.format("%s/resource/%s/%s", baseUrl, type, vulnerability.getId()));
     }
 }
