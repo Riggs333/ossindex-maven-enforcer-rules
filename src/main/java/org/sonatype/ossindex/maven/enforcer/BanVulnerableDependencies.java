@@ -134,6 +134,7 @@ public class BanVulnerableDependencies
                     Artifact artifact = entry.getKey();
                     PackageReport report = entry.getValue();
 
+                    // describe artifact and link to package information
                     buff.append("  ")
                             .append(artifact).append("; ")
                             .append(index.packageUrl(report))
