@@ -12,6 +12,7 @@
  */
 package org.sonatype.ossindex.maven.enforcer;
 
+import com.google.common.base.Stopwatch;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import org.slf4j.Logger;
@@ -42,6 +43,8 @@ public class OssIndex
 
     private static final String DEFAULT_URL = "https://ossindex.sonatype.org";
 
+    private static final int BATCH_SIZE = 64;
+
     private final URL baseUrl;
 
     private final Marshaller marshaller;
@@ -56,24 +59,22 @@ public class OssIndex
 
         // TODO: consider what may be optimal cache configuration, and/or expose for tuning?
         cache = CacheBuilder.newBuilder()
-                .maximumSize(100)
+                .maximumSize(256)
                 .expireAfterAccess(2, TimeUnit.MINUTES)
                 .softValues()
                 .build();
     }
-
-    // TODO: may need to cope with limits?  Potentially batch up smaller units and join results to cope with large sets of requests
-    // TODO: 100 may be a good batch size?
 
     public Map<PackageRequest,PackageReport> request(final List<PackageRequest> requests) throws Exception {
         checkNotNull(requests);
         checkArgument(!requests.isEmpty());
 
         log.debug("Requesting {} package-reports", requests.size());
+        Stopwatch watch = Stopwatch.createStarted();
 
         Map<PackageRequest,PackageReport> result = new LinkedHashMap<>();
 
-        // resolve cached reports and generate list of uncached requests
+        // resolve cached reports and generate list of un-cached requests
         List<PackageRequest> uncached = new LinkedList<>();
         for (PackageRequest request : requests) {
             PackageReport report = cache.getIfPresent(request);
@@ -86,18 +87,31 @@ public class OssIndex
             }
         }
 
-        // request any uncached reports and append to cache
+        // request any un-cached reports in batches and append to cache
         if (!uncached.isEmpty()) {
-            Map<PackageRequest,PackageReport> reports = doRequest(uncached);
-            cache.putAll(reports);
-            result.putAll(reports);
+            List<PackageRequest> batch = new ArrayList<>(BATCH_SIZE);
+
+            Iterator<PackageRequest> iter = uncached.iterator();
+            while (iter.hasNext()) {
+                batch.add(iter.next());
+
+                // perform request if batch size reached or if there are no more requests after current
+                if (batch.size() == BATCH_SIZE || !iter.hasNext()) {
+                    Map<PackageRequest,PackageReport> reports = doRequest(batch);
+                    cache.putAll(reports);
+                    result.putAll(reports);
+                    batch.clear();
+                }
+            }
         }
+
+        log.debug("{} package-reports; {}", result.size(), watch);
 
         return result;
     }
 
     private Map<PackageRequest,PackageReport> doRequest(final List<PackageRequest> requests) throws Exception {
-        log.debug("Requesting {} uncached package-reports", requests.size());
+        log.debug("Requesting {} un-cached package-reports", requests.size());
 
         URL url = new URL(String.format("%s/v2.0/package", baseUrl));
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
