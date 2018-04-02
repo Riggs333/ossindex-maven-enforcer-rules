@@ -46,22 +46,23 @@ public class OssIndex
 
     private final Marshaller marshaller;
 
-    // TODO: consider what may be optimal cache configuration, and/or expose for tuning?
-
-    private final Cache<PackageRequest, PackageReport> cache = CacheBuilder.newBuilder()
-            .maximumSize(100)
-            .expireAfterAccess(2, TimeUnit.MINUTES)
-            .softValues()
-            .build();
+    private final Cache<PackageRequest, PackageReport> cache;
 
     public OssIndex() {
         baseUrl = url(DEFAULT_URL);
         log.debug("Base URL: {}", baseUrl);
 
         marshaller = new Marshaller();
+
+        // TODO: consider what may be optimal cache configuration, and/or expose for tuning?
+        cache = CacheBuilder.newBuilder()
+                .maximumSize(100)
+                .expireAfterAccess(2, TimeUnit.MINUTES)
+                .softValues()
+                .build();
     }
 
-    // TODO: may need to cope with limits?
+    // TODO: may need to cope with limits?  Potentially batch up smaller units and join results to cope with large sets of requests
 
     public Map<PackageRequest,PackageReport> request(final List<PackageRequest> requests) throws Exception {
         checkNotNull(requests);
