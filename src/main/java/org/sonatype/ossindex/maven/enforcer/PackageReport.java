@@ -46,6 +46,9 @@ public class PackageReport
     @SerializedName("vulnerability-matches")
     private int vulnerabilityMatches;
 
+    /**
+     * Vulnerability details.
+     */
     public static class Vulnerability
     {
         private long id;
