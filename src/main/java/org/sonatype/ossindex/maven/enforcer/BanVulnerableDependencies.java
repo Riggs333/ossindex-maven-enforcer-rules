@@ -159,11 +159,15 @@ public class BanVulnerableDependencies
                             .append("\n");
 
                     // include terse details about vulnerability and link to more detailed information
-                    for (PackageReport.Vulnerability vulnerability : report.getVulnerabilities()) {
+                    Iterator<PackageReport.Vulnerability> iter = report.getVulnerabilities().iterator();
+                    while (iter.hasNext()) {
+                        PackageReport.Vulnerability vulnerability = iter.next();
                         buff.append("    * ")
                                 .append(vulnerability.getTitle())
-                                .append("; ").append(index.referenceUrl(vulnerability))
-                                .append("\n");
+                                .append("; ").append(index.referenceUrl(vulnerability));
+                        if (iter.hasNext()) {
+                            buff.append("\n");
+                        }
                     }
                 }
 
