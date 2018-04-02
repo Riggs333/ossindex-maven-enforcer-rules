@@ -76,8 +76,10 @@ public class OssIndex {
             try (InputStream input = connection.getInputStream()) {
                 List<PackageReport> reports = marshaller.unmarshal(input);
 
-                // TODO: check if the order of input parameters is directly related to output order
-                // TODO: ... if so, should ensure sizes match, if not need to correlate report back to request
+                // puke if the response does not contain the same number of entries as input request
+                if (reports.size() != requests.size()) {
+                    throw new RuntimeException("Result size mismatch; expected: " + requests.size() + ", have: " + reports.size());
+                }
 
                 Map<PackageRequest,PackageReport> result = new LinkedHashMap<>();
                 int i = 0;
