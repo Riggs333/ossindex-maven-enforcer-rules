@@ -40,11 +40,7 @@ public class OssIndex {
     private final Marshaller marshaller;
 
     public OssIndex() {
-        try {
-            baseUrl = new URL(DEFAULT_URL);
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
-        }
+        baseUrl = url(DEFAULT_URL);
         log.debug("Base URL: {}", baseUrl);
 
         marshaller = new Marshaller();
@@ -95,7 +91,7 @@ public class OssIndex {
         throw new RuntimeException("Unexpected response; status: " + status);
     }
 
-    private URL url(final String url) {
+    private static URL url(final String url) {
         try {
             return new URL(url);
         } catch (MalformedURLException e) {
