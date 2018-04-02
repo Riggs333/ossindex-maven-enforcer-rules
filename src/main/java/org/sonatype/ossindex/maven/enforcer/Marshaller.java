@@ -55,6 +55,8 @@ public class Marshaller
 
     /**
      * Joda-time {@link DateTime} adapter.
+     *
+     * FIXME: REST v2.0 API encodes as milliseconds from EPOCH.
      */
     private static class DateTimeAdapter
         implements JsonDeserializer<DateTime>, JsonSerializer<DateTime>
