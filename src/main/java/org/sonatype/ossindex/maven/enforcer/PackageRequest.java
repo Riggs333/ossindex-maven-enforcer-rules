@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.Objects;
 
 /**
- * ???
+ * Package request coordinates.
  *
  * @since ???
  */
