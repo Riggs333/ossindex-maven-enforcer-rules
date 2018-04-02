@@ -152,6 +152,8 @@ public class BanVulnerableDependencies
                     Artifact artifact = entry.getKey();
                     PackageReport report = entry.getValue();
 
+                    // TODO: consider using some ANSI colors here to make things standout a bit more?
+
                     // describe artifact and link to package information
                     buff.append("  ")
                             .append(artifact).append("; ")
