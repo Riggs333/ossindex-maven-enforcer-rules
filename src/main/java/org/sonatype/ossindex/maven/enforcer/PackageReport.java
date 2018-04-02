@@ -13,6 +13,7 @@
 package org.sonatype.ossindex.maven.enforcer;
 
 import com.google.gson.annotations.SerializedName;
+import org.joda.time.DateTime;
 
 import java.net.URI;
 import java.net.URL;
@@ -67,11 +68,9 @@ public class PackageReport
 
         private List<URL> references = new ArrayList<>();
 
-        // TODO: Date or DateTime?
-        private long published;
+        private DateTime published;
 
-        // TODO: Date or DateTime?
-        private long updated;
+        private DateTime updated;
 
         private String cve;
 
@@ -125,19 +124,19 @@ public class PackageReport
             this.references = references;
         }
 
-        public long getPublished() {
+        public DateTime getPublished() {
             return published;
         }
 
-        public void setPublished(long published) {
+        public void setPublished(DateTime published) {
             this.published = published;
         }
 
-        public long getUpdated() {
+        public DateTime getUpdated() {
             return updated;
         }
 
-        public void setUpdated(long updated) {
+        public void setUpdated(DateTime updated) {
             this.updated = updated;
         }
 

@@ -12,13 +12,13 @@
  */
 package org.sonatype.ossindex.maven.enforcer;
 
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
+import org.joda.time.DateTime;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Type;
 import java.util.List;
 
 /**
@@ -33,6 +33,7 @@ public class Marshaller
     public Marshaller() {
         gson = new GsonBuilder()
                 .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+                .registerTypeAdapter(DateTime.class, new DateTimeAdapter())
                 .create();
     }
 
@@ -50,5 +51,22 @@ public class Marshaller
 
     public String marshal(final List<PackageRequest> request) {
         return gson.toJson(request);
+    }
+
+    /**
+     * Joda-time {@link DateTime} adapter.
+     */
+    private static class DateTimeAdapter
+        implements JsonDeserializer<DateTime>, JsonSerializer<DateTime>
+    {
+        @Override
+        public DateTime deserialize(final JsonElement element, final Type type, final JsonDeserializationContext context) throws JsonParseException {
+            return new DateTime(element.getAsJsonPrimitive().getAsLong());
+        }
+
+        @Override
+        public JsonElement serialize(final DateTime value, final Type type, final JsonSerializationContext context) {
+            return new JsonPrimitive(value.getMillis());
+        }
     }
 }
