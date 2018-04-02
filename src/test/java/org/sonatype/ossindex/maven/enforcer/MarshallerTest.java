@@ -12,7 +12,7 @@
  */
 package org.sonatype.ossindex.maven.enforcer;
 
-import org.joda.time.DateTime;
+import org.joda.time.Instant;
 import org.junit.Before;
 import org.junit.Test;
 import org.sonatype.goodies.testsupport.TestSupport;
@@ -113,8 +113,8 @@ public class MarshallerTest
             assertThat(vuln1.getReferences(), notNullValue());
             assertThat(vuln1.getReferences().size(), is(5));
             assertThat(vuln1.getReferences(), hasItem(new URL("https://cwe.mitre.org/data/definitions/79.html")));
-            assertThat(vuln1.getPublished(), is(new DateTime(1470469775500L)));
-            assertThat(vuln1.getUpdated(), is(new DateTime(1490153875967L)));
+            assertThat(vuln1.getPublished(), is(new Instant(1470469775500L)));
+            assertThat(vuln1.getUpdated(), is(new Instant(1490153875967L)));
         }
     }
 

@@ -14,7 +14,7 @@ package org.sonatype.ossindex.maven.enforcer;
 
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
-import org.joda.time.DateTime;
+import org.joda.time.Instant;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -33,7 +33,7 @@ public class Marshaller
     public Marshaller() {
         gson = new GsonBuilder()
                 .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-                .registerTypeAdapter(DateTime.class, new DateTimeAdapter())
+                .registerTypeAdapter(Instant.class, new InstantAdapter())
                 .create();
     }
 
@@ -54,20 +54,18 @@ public class Marshaller
     }
 
     /**
-     * Joda-time {@link DateTime} adapter.
-     *
-     * FIXME: REST v2.0 API encodes as milliseconds from EPOCH.
+     * Joda-time {@link Instant} adapter.
      */
-    private static class DateTimeAdapter
-        implements JsonDeserializer<DateTime>, JsonSerializer<DateTime>
+    private static class InstantAdapter
+        implements JsonDeserializer<Instant>, JsonSerializer<Instant>
     {
         @Override
-        public DateTime deserialize(final JsonElement element, final Type type, final JsonDeserializationContext context) throws JsonParseException {
-            return new DateTime(element.getAsJsonPrimitive().getAsLong());
+        public Instant deserialize(final JsonElement element, final Type type, final JsonDeserializationContext context) throws JsonParseException {
+            return new Instant(element.getAsLong());
         }
 
         @Override
-        public JsonElement serialize(final DateTime value, final Type type, final JsonSerializationContext context) {
+        public JsonElement serialize(final Instant value, final Type type, final JsonSerializationContext context) {
             return new JsonPrimitive(value.getMillis());
         }
     }
