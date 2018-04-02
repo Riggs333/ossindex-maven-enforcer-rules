@@ -84,7 +84,7 @@ public class BanVulnerableDependencies
             this.session = lookup(helper, "${session}", MavenSession.class);
             this.project = lookup(helper,"${project}", MavenProject.class);
             this.graphBuilder = lookup(helper, DependencyGraphBuilder.class);
-            this.index = new OssIndex();
+            this.index = lookup(helper, OssIndex.class);
         }
 
         public void run() throws EnforcerRuleException {

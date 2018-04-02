@@ -12,6 +12,8 @@
  */
 package org.sonatype.ossindex.maven.enforcer;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,13 +24,14 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
-
-// TODO: convert to Maven component, or create a Provider component to resolve instance?
+import java.util.concurrent.TimeUnit;
 
 /**
  * Sonatype OSS Index access.
  *
  * @since ???
+ *
+ * @see OssIndexProvider
  */
 public class OssIndex {
     private static final Logger log = LoggerFactory.getLogger(OssIndex.class);
@@ -38,6 +41,14 @@ public class OssIndex {
     private final URL baseUrl;
 
     private final Marshaller marshaller;
+
+    // TODO: consider what may be optimal cache configuration, and/or expose for tuning?
+
+    private final Cache<PackageRequest, PackageReport> cache = CacheBuilder.newBuilder()
+            .maximumSize(100)
+            .expireAfterAccess(2, TimeUnit.MINUTES)
+            .softValues()
+            .build();
 
     public OssIndex() {
         baseUrl = url(DEFAULT_URL);
@@ -50,6 +61,34 @@ public class OssIndex {
 
     public Map<PackageRequest,PackageReport> request(final List<PackageRequest> requests) throws Exception {
         log.debug("Requesting {} package-reports", requests.size());
+
+        Map<PackageRequest,PackageReport> result = new LinkedHashMap<>();
+
+        // resolve cached reports and generate list of uncached requests
+        List<PackageRequest> uncached = new LinkedList<>();
+        for (PackageRequest request : requests) {
+            PackageReport report = cache.getIfPresent(request);
+            if (report != null) {
+                log.debug("Found cached report for: {}", request);
+                result.put(request, report);
+            }
+            else {
+                uncached.add(request);
+            }
+        }
+
+        // request any uncached reports and append to cache
+        if (!uncached.isEmpty()) {
+            Map<PackageRequest,PackageReport> reports = doRequest(uncached);
+            cache.putAll(reports);
+            result.putAll(reports);
+        }
+
+        return result;
+    }
+
+    private Map<PackageRequest,PackageReport> doRequest(final List<PackageRequest> requests) throws Exception {
+        log.debug("Requesting {} uncached package-reports", requests.size());
 
         URL url = new URL(String.format("%s/v2.0/package", baseUrl));
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
