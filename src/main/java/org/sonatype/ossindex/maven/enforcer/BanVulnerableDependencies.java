@@ -102,15 +102,12 @@ public class BanVulnerableDependencies
                 throw new RuntimeException("Failed to resolve dependencies", e);
             }
 
-            // check if any dependencies have vulnerabilities
             log.info("Checking for vulnerabilities:");
-            for (Artifact artifact : dependencies) {
-                log.info("  " + artifact);
-            }
 
             // generate package requests and map back to artifacts for result handling
             Map<PackageRequest, Artifact> requests = new HashMap<>();
             for (Artifact artifact : dependencies) {
+                log.info("  " + artifact);
                 PackageRequest request = new PackageRequest("maven", artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion());
                 requests.put(request, artifact);
             }

@@ -23,7 +23,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 
-// TODO: convert to component
+// TODO: convert to Maven component, or create a Provider component to resolve instance?
 
 /**
  * Sonatype OSS Index access.
@@ -77,7 +77,7 @@ public class OssIndex {
                 List<PackageReport> reports = marshaller.unmarshal(input);
 
                 // TODO: check if the order of input parameters is directly related to output order
-                // TODO: ... if so, should ensure sizes match, if not need to correlate report back to artifact
+                // TODO: ... if so, should ensure sizes match, if not need to correlate report back to request
 
                 Map<PackageRequest,PackageReport> result = new LinkedHashMap<>();
                 int i = 0;
