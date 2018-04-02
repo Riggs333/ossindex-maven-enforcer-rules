@@ -54,6 +54,8 @@ public class OssIndex {
 
         // TODO: consider better ways to use existing http-client infrastructure in Maven
 
+        // TODO: consider exposing bulk/batch apis as enforcer rule will know up front all the coordinates
+
         URL url = new URL(String.format("%s/v2.0/package/%s/%s/%s/%s", baseUrl, "maven", artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion()));
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setDoOutput(true);
