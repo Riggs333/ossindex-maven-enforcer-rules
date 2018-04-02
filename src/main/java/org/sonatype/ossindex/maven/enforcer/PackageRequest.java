@@ -17,6 +17,8 @@ import com.google.gson.annotations.SerializedName;
 import javax.annotation.Nullable;
 import java.util.Objects;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Package request coordinates.
  *
@@ -28,10 +30,10 @@ import java.util.Objects;
 public class PackageRequest
 {
     public PackageRequest(final String format, @Nullable final String group, final String name, final String version) {
-        this.format = format;
+        this.format = checkNotNull(format);
         this.group = group;
-        this.name = name;
-        this.version = version;
+        this.name = checkNotNull(name);
+        this.version = checkNotNull(version);
     }
 
     public PackageRequest(final String format, final String name, final String version) {

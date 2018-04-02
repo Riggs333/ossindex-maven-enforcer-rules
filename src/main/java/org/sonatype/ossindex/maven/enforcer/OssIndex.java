@@ -26,6 +26,9 @@ import java.net.URL;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Sonatype OSS Index access.
  *
@@ -60,6 +63,9 @@ public class OssIndex {
     // TODO: may need to cope with limits?
 
     public Map<PackageRequest,PackageReport> request(final List<PackageRequest> requests) throws Exception {
+        checkNotNull(requests);
+        checkArgument(!requests.isEmpty());
+
         log.debug("Requesting {} package-reports", requests.size());
 
         Map<PackageRequest,PackageReport> result = new LinkedHashMap<>();
@@ -141,10 +147,12 @@ public class OssIndex {
     }
 
     public URL packageUrl(final PackageReport report) {
+        checkNotNull(report);
         return url(String.format("%s/resource/package/%s", baseUrl, report.getId()));
     }
 
     public URL referenceUrl(final PackageReport.Vulnerability vulnerability) {
+        checkNotNull(vulnerability);
         String type;
         if (vulnerability.getCve() == null) {
             type = "vulnerability";
