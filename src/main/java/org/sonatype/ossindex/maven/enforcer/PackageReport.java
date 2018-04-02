@@ -67,10 +67,10 @@ public class PackageReport
 
         private List<URL> references = new ArrayList<>();
 
-        // TODO: DateTime?
+        // TODO: Date or DateTime?
         private long published;
 
-        // TODO: DateTime?
+        // TODO: Date or DateTime?
         private long updated;
 
         private String cve;
