@@ -108,11 +108,19 @@ public class BanVulnerableDependencies
                 log.info("  " + artifact);
             }
 
+            // generate package requests and map back to artifacts for result handling
+            Map<PackageRequest, Artifact> requests = new HashMap<>();
+            for (Artifact artifact : dependencies) {
+                PackageRequest request = new PackageRequest("maven", artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion());
+                requests.put(request, artifact);
+            }
+
             Map<Artifact, PackageReport> vulnerableDependencies = new HashMap<>();
             try {
-                Map<Artifact, PackageReport> reports = index.request(new ArrayList<>(dependencies));
-                for (Map.Entry<Artifact, PackageReport> entry : reports.entrySet()) {
-                    Artifact artifact = entry.getKey();
+                Map<PackageRequest, PackageReport> reports = index.request(new ArrayList<>(requests.keySet()));
+                for (Map.Entry<PackageRequest, PackageReport> entry : reports.entrySet()) {
+                    PackageRequest request = entry.getKey();
+                    Artifact artifact = requests.get(request);
                     PackageReport report = entry.getValue();
 
                     // if report contains any vulnerabilities then record artifact mapping

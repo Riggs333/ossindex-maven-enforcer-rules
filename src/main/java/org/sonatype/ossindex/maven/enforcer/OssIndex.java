@@ -12,7 +12,6 @@
  */
 package org.sonatype.ossindex.maven.enforcer;
 
-import org.apache.maven.artifact.Artifact;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,43 +50,10 @@ public class OssIndex {
         marshaller = new Marshaller();
     }
 
-    public PackageReport request(final Artifact artifact) throws Exception {
-        log.debug("Requesting package-report for: {}", artifact);
+    // TODO: may need to cope with limits?
 
-        // TODO: consider better ways to use existing http-client infrastructure in Maven
-
-        URL url = new URL(String.format("%s/v2.0/package/%s/%s/%s/%s", baseUrl, "maven", artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion()));
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setDoOutput(true);
-
-        connection.addRequestProperty("Accept", "application/json");
-
-        log.debug("Connecting to: {}", url);
-        connection.connect();
-
-        // TODO: consider minimal retry logic?
-
-        int status = connection.getResponseCode();
-        if (status == HttpURLConnection.HTTP_OK) {
-            try (InputStream input = connection.getInputStream()) {
-                List<PackageReport> results = marshaller.unmarshal(input);
-                if (results.isEmpty()) {
-                    throw new RuntimeException("Request returned zero results");
-                }
-                // for format/package/version requests only 1 entry is expected, pluck off the first entry
-                return results.get(0);
-            }
-        }
-
-        throw new RuntimeException("Unexpected response; status: " + status);
-    }
-
-    public Map<Artifact,PackageReport> request(final List<Artifact> artifacts) throws Exception {
-        log.debug("Requesting package-report for: {} artifacts", artifacts.size());
-        List<PackageRequest> requests = new ArrayList<>(artifacts.size());
-        for (Artifact artifact : artifacts) {
-            requests.add(new PackageRequest("maven", artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion()));
-        }
+    public Map<PackageRequest,PackageReport> request(final List<PackageRequest> requests) throws Exception {
+        log.debug("Requesting {} package-reports", requests.size());
 
         URL url = new URL(String.format("%s/v2.0/package", baseUrl));
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -114,10 +80,10 @@ public class OssIndex {
                 // TODO: check if the order of input parameters is directly related to output order
                 // TODO: ... if so, should ensure sizes match, if not need to correlate report back to artifact
 
-                Map<Artifact,PackageReport> result = new LinkedHashMap<>();
+                Map<PackageRequest,PackageReport> result = new LinkedHashMap<>();
                 int i = 0;
-                for (Artifact artifact : artifacts) {
-                    result.put(artifact, reports.get(i++));
+                for (PackageRequest request : requests) {
+                    result.put(request, reports.get(i++));
                 }
                 return result;
             }
