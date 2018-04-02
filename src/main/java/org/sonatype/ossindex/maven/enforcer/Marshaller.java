@@ -22,15 +22,15 @@ import java.io.InputStreamReader;
 import java.util.List;
 
 /**
- * {@link PackageReport} marshaller.
+ * Marshalling helper.
  *
  * @since ???
  */
-public class PackageReportMarshaller {
-    private final Gson parser;
+public class Marshaller {
+    private final Gson gson;
 
-    public PackageReportMarshaller() {
-        parser = new GsonBuilder()
+    public Marshaller() {
+        gson = new GsonBuilder()
                 .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
                 .create();
     }
@@ -38,6 +38,16 @@ public class PackageReportMarshaller {
     private static final TypeToken<List<PackageReport>> LIST_PACKAGE_REPORT = new TypeToken<List<PackageReport>>() {};
 
     public List<PackageReport> unmarshal(final InputStream input) {
-        return parser.fromJson(new InputStreamReader(input), LIST_PACKAGE_REPORT.getType());
+        return gson.fromJson(new InputStreamReader(input), LIST_PACKAGE_REPORT.getType());
+    }
+
+    public String marshal(final PackageRequest request) {
+        return gson.toJson(request);
+    }
+
+    private static final TypeToken<List<PackageRequest>> LIST_PACKAGE_REQUEST = new TypeToken<List<PackageRequest>>() {};
+
+    public String marshal(final List<PackageRequest> request) {
+        return gson.toJson(request);
     }
 }

@@ -25,10 +25,7 @@ import org.apache.maven.shared.dependency.graph.DependencyNode;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Map;
-import java.util.Set;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.*;
 
 /**
  * Enforcer rule to ban vulnerable dependencies.
@@ -107,21 +104,25 @@ public class BanVulnerableDependencies
 
             // check if any dependencies have vulnerabilities
             log.info("Checking for vulnerabilities:");
-            Map<Artifact, PackageReport> vulnerableDependencies = new HashMap<>();
             for (Artifact artifact : dependencies) {
                 log.info("  " + artifact);
-                try {
-                    // TODO: consider some form of caching to avoid hitting the service for multi-module builds over and over?
-                    PackageReport report = index.request(artifact);
+            }
+
+            Map<Artifact, PackageReport> vulnerableDependencies = new HashMap<>();
+            try {
+                Map<Artifact, PackageReport> reports = index.request(new ArrayList<>(dependencies));
+                for (Map.Entry<Artifact, PackageReport> entry : reports.entrySet()) {
+                    Artifact artifact = entry.getKey();
+                    PackageReport report = entry.getValue();
 
                     // if report contains any vulnerabilities then record artifact mapping
                     if (!report.getVulnerabilities().isEmpty()) {
                         vulnerableDependencies.put(artifact, report);
                     }
                 }
-                catch (Exception e) {
-                    log.warn("Failed to fetch package-report for: " + artifact, e);
-                }
+            }
+            catch (Exception e) {
+                log.warn("Failed to fetch package-reports", e);
             }
 
             // if any vulnerabilities were detected, generate a report and complain
