@@ -9,20 +9,10 @@
         <version>1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>bar</artifactId>
+    <artifactId>baz</artifactId>
     <name>${project.groupId}:${project.artifactId}</name>
     <packaging>jar</packaging>
 
-    <dependencies>
-        <dependency>
-            <groupId>commons-fileupload</groupId>
-            <artifactId>commons-fileupload</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-        </dependency>
-    </dependencies>
+    <!-- no dependencies -->
 
 </project>

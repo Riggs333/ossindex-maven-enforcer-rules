@@ -94,12 +94,24 @@ public class BanVulnerableDependencies
                 return;
             }
 
+            // skip if packaging is pom
+            if ("pom".equals(project.getPackaging())) {
+                log.debug("Skipping POM module");
+                return;
+            }
+
             // determine dependencies
             Set<Artifact> dependencies;
             try {
                 dependencies = resolveDependencies();
             } catch (DependencyGraphBuilderException e) {
                 throw new RuntimeException("Failed to resolve dependencies", e);
+            }
+
+            // skip if project has no dependencies
+            if (dependencies.isEmpty()) {
+                log.debug("Skipping; no dependencies found");
+                return;
             }
 
             log.info("Checking for vulnerabilities:");
