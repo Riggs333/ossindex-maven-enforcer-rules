@@ -60,6 +60,9 @@ public class OssIndex {
         connection.setDoInput(true);
         connection.setDoOutput(true);
 
+        // TODO: bring back User-Agent
+        // TODO: consider using Maven http-client framework and/or adapt to proxy settings, etc
+
         connection.setRequestMethod("POST");
         connection.addRequestProperty("Content-Type", "application/json");
         connection.addRequestProperty("Accept", "application/json");
