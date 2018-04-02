@@ -2,6 +2,7 @@ package org.sonatype.ossindex.maven.enforcer;
 
 import com.google.gson.annotations.SerializedName;
 
+import javax.annotation.Nullable;
 import java.util.Objects;
 
 /**
@@ -11,17 +12,15 @@ import java.util.Objects;
  */
 public class PackageRequest
 {
-    public PackageRequest(final String format, final String name, final String version) {
-        this.format = format;
-        this.name = name;
-        this.version = version;
-    }
-
-    public PackageRequest(final String format, final String group, final String name, final String version) {
+    public PackageRequest(final String format, @Nullable final String group, final String name, final String version) {
         this.format = format;
         this.group = group;
         this.name = name;
         this.version = version;
+    }
+
+    public PackageRequest(final String format, final String name, final String version) {
+        this(format, null, name, version);
     }
 
     public PackageRequest() {
@@ -31,6 +30,7 @@ public class PackageRequest
     @SerializedName("pm")
     private String format;
 
+    @Nullable
     private String group;
 
     private String name;
@@ -45,6 +45,7 @@ public class PackageRequest
         this.format = format;
     }
 
+    @Nullable
     public String getGroup() {
         return group;
     }
