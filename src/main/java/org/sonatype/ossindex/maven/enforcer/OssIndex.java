@@ -36,7 +36,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @see OssIndexProvider
  */
-public class OssIndex {
+public class OssIndex
+{
     private static final Logger log = LoggerFactory.getLogger(OssIndex.class);
 
     private static final String DEFAULT_URL = "https://ossindex.sonatype.org";

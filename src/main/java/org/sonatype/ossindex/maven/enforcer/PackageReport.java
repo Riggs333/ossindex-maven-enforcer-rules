@@ -27,7 +27,8 @@ import java.util.List;
  * @see PackageRequest
  * @see Marshaller
  */
-public class PackageReport {
+public class PackageReport
+{
     private long id;
 
     @SerializedName("pm")

@@ -26,7 +26,8 @@ import java.util.List;
  *
  * @since ???
  */
-public class Marshaller {
+public class Marshaller
+{
     private final Gson gson;
 
     public Marshaller() {
