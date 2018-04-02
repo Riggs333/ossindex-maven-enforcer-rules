@@ -17,12 +17,17 @@ import org.junit.Test;
 import org.sonatype.goodies.testsupport.TestSupport;
 
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -70,6 +75,11 @@ public class MarshallerTest
             assertThat(report.getGroup(), is("commons-fileupload"));
             assertThat(report.getName(), is("commons-fileupload"));
             assertThat(report.getVersion(), is("1.3"));
+
+            List<PackageReport.Vulnerability> vulnerabilities = report.getVulnerabilities();
+            assertThat(vulnerabilities, not(empty()));
+            PackageReport.Vulnerability vuln1 = vulnerabilities.get(0);
+            assertThat(vuln1.getIds(), hasEntry("CVE", "CVE-2014-0050"));
         }
     }
 
@@ -95,12 +105,13 @@ public class MarshallerTest
             PackageReport.Vulnerability vuln1 = vulnerabilities.get(0);
             assertThat(vuln1, notNullValue(PackageReport.Vulnerability.class));
             assertThat(vuln1.getId(), is(8399962417L));
-            assertThat(vuln1.getResource(), is("https://github.com/jquery/jquery/issues/2432"));
+            assertThat(vuln1.getResource(), is(new URI("https://github.com/jquery/jquery/issues/2432")));
             assertThat(vuln1.getTitle(), is("Cross Site Scripting (XSS)"));
             assertThat(vuln1.getVersions(), notNullValue());
             assertThat(vuln1.getVersions().size(), is(1));
             assertThat(vuln1.getReferences(), notNullValue());
             assertThat(vuln1.getReferences().size(), is(5));
+            assertThat(vuln1.getReferences(), hasItem(new URL("https://cwe.mitre.org/data/definitions/79.html")));
             assertThat(vuln1.getPublished(), is(1470469775500L));
             assertThat(vuln1.getUpdated(), is(1490153875967L));
         }

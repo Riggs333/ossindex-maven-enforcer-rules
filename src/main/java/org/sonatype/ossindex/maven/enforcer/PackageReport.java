@@ -14,8 +14,12 @@ package org.sonatype.ossindex.maven.enforcer;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 // NOTE: this is based on the current v2 REST api, but likely to change
 
@@ -53,7 +57,7 @@ public class PackageReport
     {
         private long id;
 
-        private String resource;
+        private URI resource;
 
         private String title;
 
@@ -61,13 +65,17 @@ public class PackageReport
 
         private List<String> versions = new ArrayList<>();
 
-        private List<String> references = new ArrayList<>();
+        private List<URL> references = new ArrayList<>();
 
+        // TODO: DateTime?
         private long published;
 
+        // TODO: DateTime?
         private long updated;
 
         private String cve;
+
+        private Map<String,String> ids = new HashMap<>();
 
         public long getId() {
             return id;
@@ -77,11 +85,11 @@ public class PackageReport
             this.id = id;
         }
 
-        public String getResource() {
+        public URI getResource() {
             return resource;
         }
 
-        public void setResource(String resource) {
+        public void setResource(URI resource) {
             this.resource = resource;
         }
 
@@ -109,11 +117,11 @@ public class PackageReport
             this.versions = versions;
         }
 
-        public List<String> getReferences() {
+        public List<URL> getReferences() {
             return references;
         }
 
-        public void setReferences(List<String> references) {
+        public void setReferences(List<URL> references) {
             this.references = references;
         }
 
@@ -139,6 +147,14 @@ public class PackageReport
 
         public void setCve(String cve) {
             this.cve = cve;
+        }
+
+        public Map<String, String> getIds() {
+            return ids;
+        }
+
+        public void setIds(Map<String, String> ids) {
+            this.ids = ids;
         }
     }
 
