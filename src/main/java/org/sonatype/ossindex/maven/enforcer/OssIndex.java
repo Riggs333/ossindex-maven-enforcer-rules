@@ -63,6 +63,7 @@ public class OssIndex
     }
 
     // TODO: may need to cope with limits?  Potentially batch up smaller units and join results to cope with large sets of requests
+    // TODO: 100 may be a good batch size?
 
     public Map<PackageRequest,PackageReport> request(final List<PackageRequest> requests) throws Exception {
         checkNotNull(requests);
