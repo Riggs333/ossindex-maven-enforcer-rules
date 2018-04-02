@@ -9,6 +9,9 @@ import java.util.Objects;
  * Package request coordinates.
  *
  * @since ???
+ *
+ * @see PackageReport
+ * @see Marshaller
  */
 public class PackageRequest
 {
