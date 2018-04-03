@@ -22,6 +22,9 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
 import org.apache.maven.shared.dependency.graph.DependencyGraphBuilderException;
 import org.apache.maven.shared.dependency.graph.DependencyNode;
+import org.sonatype.ossindex.client.OssIndex;
+import org.sonatype.ossindex.client.PackageReport;
+import org.sonatype.ossindex.client.PackageRequest;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
