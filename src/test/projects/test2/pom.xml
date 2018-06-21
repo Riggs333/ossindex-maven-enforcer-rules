@@ -3,8 +3,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>local.ossindex-maven-enforcer-rules</groupId>
-  <artifactId>test1</artifactId>
+  <groupId>org.sonatype.ossindex.maven.enforcer</groupId>
+  <artifactId>test2</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
   <packaging>jar</packaging>
 
@@ -30,7 +30,7 @@
           <dependency>
             <groupId>org.sonatype.ossindex</groupId>
             <artifactId>ossindex-maven-enforcer-rules</artifactId>
-            <version>1-SNAPSHOT</version>
+            <version>@project.version@</version>
           </dependency>
         </dependencies>
         <executions>
@@ -45,8 +45,9 @@
                 <banVunerableDependencies
                     implementation="org.sonatype.ossindex.maven.enforcer.BanVulnerableDependencies">
                   <clientConfiguration>
-                    <baseUrl>http://localhost:8080</baseUrl>
+                    <baseUrl>@ossindex.baseUrl@</baseUrl>
                   </clientConfiguration>
+                  <transitive>false</transitive>
                 </banVunerableDependencies>
               </rules>
             </configuration>

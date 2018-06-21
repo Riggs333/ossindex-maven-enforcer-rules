@@ -88,6 +88,8 @@
     <maven.compiler.target>1.7</maven.compiler.target>
 
     <apache-maven.version>3.0</apache-maven.version>
+
+    <ossindex.baseUrl>https://ossindex.sonatype.org</ossindex.baseUrl>
   </properties>
 
   <dependencies>
@@ -157,9 +159,15 @@
           <artifactId>license-maven-plugin</artifactId>
           <configuration>
             <excludes combine.children="append">
-              <exclude>src/test/resources/projects/**</exclude>
+              <exclude>src/test/projects/**</exclude>
             </excludes>
           </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-invoker-plugin</artifactId>
+          <version>3.1.0</version>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -266,6 +274,35 @@
                   <goal>integration-test</goal>
                   <goal>verify</goal>
                 </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-invoker-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>integration-test</id>
+                <goals>
+                  <goal>install</goal>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <failIfNoProjects>true</failIfNoProjects>
+                  <projectsDirectory>${project.basedir}/src/test/projects</projectsDirectory>
+                  <cloneProjectsTo>${project.build.directory}/test-projects</cloneProjectsTo>
+                  <pomIncludes>
+                    <pomInclude>*/pom.xml</pomInclude>
+                  </pomIncludes>
+                  <settingsFile>${project.basedir}/src/test/projects/settings.xml</settingsFile>
+                  <localRepositoryPath>${project.build.directory}/test-repo</localRepositoryPath>
+                  <filterProperties>
+                    <ossindex.baseUrl>${ossindex.baseUrl}</ossindex.baseUrl>
+                  </filterProperties>
+                  <preBuildHookScript>setup</preBuildHookScript>
+                  <postBuildHookScript>verify</postBuildHookScript>
+                </configuration>
               </execution>
             </executions>
           </plugin>
