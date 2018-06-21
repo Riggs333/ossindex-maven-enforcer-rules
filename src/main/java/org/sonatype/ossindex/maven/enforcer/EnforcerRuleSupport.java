@@ -12,15 +12,15 @@
  */
 package org.sonatype.ossindex.maven.enforcer;
 
-import org.apache.maven.enforcer.rule.api.EnforcerRule;
-import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
-import org.apache.maven.enforcer.rule.api.EnforcerRule2;
-import org.apache.maven.enforcer.rule.api.EnforcerLevel;
-import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
+import org.apache.maven.enforcer.rule.api.EnforcerLevel;
+import org.apache.maven.enforcer.rule.api.EnforcerRule;
+import org.apache.maven.enforcer.rule.api.EnforcerRule2;
+import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
+import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 /**
  * Support for {@link EnforcerRule} implementations.
@@ -30,48 +30,50 @@ import javax.annotation.Nullable;
 public abstract class EnforcerRuleSupport
     implements EnforcerRule2
 {
-    private EnforcerLevel level = EnforcerLevel.ERROR;
+  private EnforcerLevel level = EnforcerLevel.ERROR;
 
-    public void setLevel(final EnforcerLevel level) {
-        this.level = level;
-    }
+  public void setLevel(final EnforcerLevel level) {
+    this.level = level;
+  }
 
-    @Nonnull
-    @Override
-    public EnforcerLevel getLevel() {
-        return level;
-    }
+  @Nonnull
+  @Override
+  public EnforcerLevel getLevel() {
+    return level;
+  }
 
-    @Override
-    public boolean isCacheable() {
-        return false;
-    }
+  @Override
+  public boolean isCacheable() {
+    return false;
+  }
 
-    @Nullable
-    @Override
-    public String getCacheId() {
-        return "0";
-    }
+  @Nullable
+  @Override
+  public String getCacheId() {
+    return "0";
+  }
 
-    @Override
-    public boolean isResultValid(@Nonnull EnforcerRule rule) {
-        return false;
-    }
+  @Override
+  public boolean isResultValid(@Nonnull EnforcerRule rule) {
+    return false;
+  }
 
-    @SuppressWarnings("unchecked")
-    protected <T> T lookup(final EnforcerRuleHelper helper, final String expression, final Class<T> type) {
-        try {
-            return (T) helper.evaluate(expression);
-        } catch (ExpressionEvaluationException e) {
-            throw new RuntimeException("Failed to evaluate expression: " + expression, e);
-        }
+  @SuppressWarnings("unchecked")
+  protected <T> T lookup(final EnforcerRuleHelper helper, final String expression, final Class<T> type) {
+    try {
+      return (T) helper.evaluate(expression);
     }
+    catch (ExpressionEvaluationException e) {
+      throw new RuntimeException("Failed to evaluate expression: " + expression, e);
+    }
+  }
 
-    protected <T> T lookup(final EnforcerRuleHelper helper, final Class<T> type) {
-        try {
-            return helper.getComponent(type);
-        } catch (ComponentLookupException e) {
-            throw new RuntimeException("Failed to lookup component: " + type.getSimpleName(), e);
-        }
+  protected <T> T lookup(final EnforcerRuleHelper helper, final Class<T> type) {
+    try {
+      return helper.getComponent(type);
     }
+    catch (ComponentLookupException e) {
+      throw new RuntimeException("Failed to lookup component: " + type.getSimpleName(), e);
+    }
+  }
 }
