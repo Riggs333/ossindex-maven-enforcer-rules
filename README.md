@@ -28,29 +28,29 @@ When Maven is in offline mode, rules that depend on a network connection are ski
 Configure an execution of the `maven-enforcer-plugin` and configure `ossindex-maven-enforcer-rules` dependency and rule:
 
     <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-enforcer-plugin</artifactId>
-        <version>3.0.0-M1</version>
-        <dependencies>
-            <dependency>
-                <groupId>org.sonatype.ossindex</groupId>
-                <artifactId>ossindex-maven-enforcer-rules</artifactId>
-                <version>1-SNAPSHOT</version>
-            </dependency>
-        </dependencies>
-        <executions>
-            <execution>
-                <phase>validate</phase>
-                <goals>
-                    <goal>enforce</goal>
-                </goals>
-                <configuration>
-                    <rules>
-                        <banVunerableDependencies implementation="org.sonatype.ossindex.maven.enforcer.BanVulnerableDependencies"/>
-                    </rules>
-                </configuration>
-            </execution>
-        </executions>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-enforcer-plugin</artifactId>
+      <version>3.0.0-M1</version>
+      <dependencies>
+        <dependency>
+          <groupId>org.sonatype.ossindex</groupId>
+          <artifactId>ossindex-maven-enforcer-rules</artifactId>
+          <version>1-SNAPSHOT</version>
+        </dependency>
+      </dependencies>
+      <executions>
+        <execution>
+          <phase>validate</phase>
+          <goals>
+            <goal>enforce</goal>
+          </goals>
+          <configuration>
+            <rules>
+              <banVunerableDependencies implementation="org.sonatype.ossindex.maven.enforcer.BanVulnerableDependencies"/>
+            </rules>
+          </configuration>
+        </execution>
+      </executions>
     </plugin>
 
 [1]: https://ossindex.sonatype.org
